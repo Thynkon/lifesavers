@@ -27,7 +27,7 @@ def main():
     if os.geteuid() != 0:
         message = "You must execute this script as root"
         print(message, file=sys.stdout)
-        syslog.syslog(message)
+        syslog.syslog(syslog.LOG_ERR, message)
 
         sys.exit(1)
 
@@ -35,7 +35,7 @@ def main():
     if not os.path.exists(directory):
         message = "{0} does not exits".format(directory)
         print(message, file=sys.stdout)
-        syslog.syslog(message)
+        syslog.syslog(syslog.LOG_ERR, message)
 
         sys.exit(1)
 
@@ -44,11 +44,11 @@ def main():
         for f in file_list:
             message = "{0} found".format(f)
             print(message)
-            syslog.syslog(message)
+            syslog.syslog(syslog.LOG_INFO, message)
     else:
         message = "No files found"
         print(message)
-        syslog.syslog(message)
+        syslog.syslog(syslog.LOG_ERR, message)
 
         sys.exit(0)
 
@@ -56,7 +56,7 @@ def main():
     for f in file_list:
         message = "{0} moved to {1}".format(f, directory)
         print(message)
-        syslog.syslog(message)
+        syslog.syslog(syslog.LOG_INFO, message)
 
     sys.exit(0)
 
