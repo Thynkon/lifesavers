@@ -15,6 +15,7 @@ def move_files(file_list, directory):
 def main():
     file_list = []
     message = ""
+    destination_directory = ""
     SHARE_DIR = "/media/share"
     FILE_PATTERN = r"^.*_[0-9]{4}-[0-9]{2}-[0-9]{2}\.tar\.(gz|bz2)$"
     parser = argparse.ArgumentParser()
@@ -23,13 +24,6 @@ def main():
 
     parser.add_argument('-d', '--directory', help="Directory to backup and delete old files", required=True)
     args = parser.parse_args()
-
-    if os.geteuid() != 0:
-        message = "You must execute this script as root"
-        print(message, file=sys.stdout)
-        syslog.syslog(syslog.LOG_ERR, message)
-
-        sys.exit(1)
 
     directory = args.directory
     if not os.path.exists(directory):
@@ -52,9 +46,10 @@ def main():
 
         sys.exit(0)
 
-    move_files(file_list, "{0}/{1}".format(SHARE_DIR, os.getenv('USER')))
+    destination_directory = "{0}/{1}/backups".format(SHARE_DIR, os.getenv('USER'))
+    move_files(file_list, destination_directory)
     for f in file_list:
-        message = "{0} moved to {1}".format(f, directory)
+        message = "{0} moved to {1}".format(f, destination_directory)
         print(message)
         syslog.syslog(syslog.LOG_INFO, message)
 
