@@ -4,20 +4,19 @@ import os, sys, argparse, re, shutil
 
 def retrieve_files(directory, file_list, regex):
     for f in os.listdir(directory):
-        match = re.search(r"{0}".format(regex), f)
+        match = re.search("{0}".format(regex), f)
         if match:
-            print("{0} found".format(f))
             file_list.append(os.path.join(directory, f))
 
 def move_files(file_list, directory):
     for f in file_list:
         shutil.move(f, directory)
-        print("{0} moved to {1}".format(f, directory))
 
 def main():
     file_list = []
-    parser = argparse.ArgumentParser()
     SHARE_DIR = "/media/share"
+    FILE_PATTERN = r"^.*_[0-9]{4}-[0-9]{2}-[0-9]{2}\.tar\.(gz|bz2)$"
+    parser = argparse.ArgumentParser()
 
     parser.add_argument('-d', '--directory', help="Directory to backup and delete old files", required=True)
     args = parser.parse_args()
@@ -31,8 +30,17 @@ def main():
         print("{0} does not exits".format(directory), file=sys.stdout)
         sys.exit(1)
 
-    retrieve_files(directory, file_list, "^.*_[0-9]{4}-[0-9]{2}-[0-9]{2}\.tar\.(gz|bz2)$")
+    retrieve_files(directory, file_list, FILE_PATTERN)
+    if len(file_list) > 0:
+        for f in file_list:
+            print("{0} found".format(f))
+    else:
+        print("No files found")
+        sys.exit(0)
+
     move_files(file_list, "{0}/{1}".format(SHARE_DIR, os.getenv('USER')))
+    for f in file_list:
+        print("{0} moved to {1}".format(f, directory))
 
     sys.exit(0)
 
